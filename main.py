@@ -1,63 +1,92 @@
 import streamlit as st
+import pandas as pd
+import datetime
 
-def main():
-    st.title("Healthy Living Goals Survey")
-    
-    # Section 1: Prioritization
-    st.header("1. Prioritize Your Goals")
-    st.write("Rank your priorities for healthy living from 1 (most important) to 5 (least important).")
-    
-    priorities = {
-        "Sleep Hygiene": st.slider("Sleep Hygiene", 1, 5, 3),
-        "Fitness": st.slider("Fitness", 1, 5, 3),
-        "Work": st.slider("Work", 1, 5, 3),
-        "Academics": st.slider("Academics", 1, 5, 3),
-        "Other Healthy Living Goals": st.slider("Other Goals", 1, 5, 3)
-    }
-    
-    st.write("### Your Priorities:")
-    sorted_priorities = sorted(priorities.items(), key=lambda x: x[1])
-    for goal, rank in sorted_priorities:
-        st.write(f"{goal}: {rank}")
-    
-    # Section 2: Current Schedule Satisfaction
-    st.header("2. How Do You Feel About Your Current Schedule?")
-    current_schedule = st.radio(
-        "Select one that best describes your current schedule:",
-        ("I feel it's balanced", "It's manageable but needs improvement", "I'm overwhelmed and need changes")
-    )
-    
-    st.write(f"**Your response:** {current_schedule}")
-    
-    # Section 3: Stress Levels
-    st.header("3. How Stressed Are You About Your Daily Routine?")
-    stress_level = st.slider("Stress Level (0 = No Stress, 10 = Extremely Stressed)", 0, 10, 5)
-    st.write(f"**Your stress level:** {stress_level}")
-    
-    # Section 4: Additional Comments
-    st.header("4. Any Additional Comments or Goals?")
-    additional_comments = st.text_area("Let us know about any specific goals, challenges, or feedback:")
-    
-    # Display Summary
-    if st.button("Submit"):
-        st.subheader("Survey Summary")
-        st.write("### Prioritization:")
-        for goal, rank in sorted_priorities:
-            st.write(f"{goal}: {rank}")
+# Function for Smart Calendar
+def smart_calendar_page():
+    st.title("📅 Smart Calendar")
+    st.write("Organize your tasks effectively and achieve balance in your schedule.")
+
+    task_name = st.text_input("Enter Task Name")
+    if task_name:
+        task_date = st.date_input("Select Task Date", datetime.date.today())
+        start_time = st.time_input("Start Time")
+        end_time = st.time_input("End Time")
         
-        st.write("### Current Schedule:")
-        st.write(current_schedule)
-        
-        st.write("### Stress Level:")
-        st.write(stress_level)
-        
-        if additional_comments:
-            st.write("### Additional Comments:")
-            st.write(additional_comments)
+        if start_time >= end_time:
+            st.error("End time must be later than start time.")
         else:
-            st.write("No additional comments provided.")
-        
-        st.success("Thank you for completing the survey!")
+            st.success(f"Task '{task_name}' scheduled on {task_date} from {start_time} to {end_time}.")
+            
+        # Placeholder for future integration with dynamic calendar
+        st.info("Future updates will include a dynamic drag-and-drop calendar view.")
 
+# Function for Progress Analytics
+def progress_page():
+    st.title("📊 Progress Tracker")
+    st.write("Visualize how you're progressing by following the calendar.")
+    
+    # Simulated Data
+    progress_data = {
+        "Week": ["Week 1", "Week 2", "Week 3", "Week 4"],
+        "Tasks Completed": [5, 8, 7, 10],
+        "Planned Hours": [15, 20, 18, 22],
+        "Achieved Hours": [13, 19, 16, 21],
+    }
+    df = pd.DataFrame(progress_data)
+    
+    st.subheader("Weekly Progress Overview")
+    st.dataframe(df)
+    
+    # Visualization
+    st.line_chart(df.set_index("Week"))
+
+# Function for Resources
+def resources_page():
+    st.title("📚 Resources")
+    st.write("Explore helpful resources to support your productivity and well-being.")
+    
+    resources = [
+        {"Resource": "10 Tips for Better Time Management", "Link": "https://www.example.com/tips"},
+        {"Resource": "Healthy Eating on a Budget", "Link": "https://www.example.com/healthy-eating"},
+        {"Resource": "Mindfulness for Stress Relief", "Link": "https://www.example.com/mindfulness"},
+    ]
+    df_resources = pd.DataFrame(resources)
+    
+    for _, row in df_resources.iterrows():
+        st.write(f"- [{row['Resource']}]({row['Link']})")
+
+# Function for Health Tips
+def health_tips_page():
+    st.title("💡 Health Tips")
+    st.write("Stay motivated and healthy with these practical tips.")
+    
+    health_tips = [
+        "Drink at least 8 glasses of water daily.",
+        "Take a 10-minute walk after every hour of sitting.",
+        "Incorporate at least 30 minutes of physical activity into your day.",
+        "Get 7-9 hours of quality sleep each night.",
+        "Eat a balanced diet rich in fruits, vegetables, and lean proteins."
+    ]
+    
+    for tip in health_tips:
+        st.info(tip)
+
+# Main Function
+def main():
+    st.sidebar.title("Dashboard Navigation")
+    option = st.sidebar.radio("Go to", ["Smart Calendar", "Progress", "Resources", "Health Tips"])
+    
+    # Routing based on user choice
+    if option == "Smart Calendar":
+        smart_calendar_page()
+    elif option == "Progress":
+        progress_page()
+    elif option == "Resources":
+        resources_page()
+    elif option == "Health Tips":
+        health_tips_page()
+
+# Entry point
 if __name__ == "__main__":
     main()

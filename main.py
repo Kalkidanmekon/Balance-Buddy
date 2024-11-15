@@ -131,6 +131,4 @@ if st.button('Next: Start Organizing'):
             st.error("Please enter at least one task to generate a schedule.")
 
 
-# Run the app
-if __name__ == "__main__":
-    main()
+

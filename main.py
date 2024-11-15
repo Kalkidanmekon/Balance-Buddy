@@ -1,6 +1,19 @@
 import streamlit as st
 import datetime
 
+# Function for Welcome Page
+def welcome_page():
+    st.title("Welcome to Balance Buddy!")
+    st.write("""
+    Welcome to **Balance Buddy**, your ultimate companion to help you balance work, health, and life. 
+    We help you organize your tasks, set your priorities, and achieve a healthy routine. 
+    Let's get started and make your life more balanced!
+    """)
+    
+    # "Get Started" button to move to the next page
+    if st.button("Get Started"):
+        st.session_state.page = "login"  # After clicking 'Get Started', navigate to the login page
+
 # Function for Task Input
 def enter_task_page():
     st.title("Enter Your Task")
@@ -72,7 +85,7 @@ def enter_task_page():
         else:
             st.write(f"Task will be done in the {part_of_day} for {hours} hours.")
 
-# Function for Tasks with Deadlines (monthly)
+# Function for Tasks with Deadline (monthly)
 def tasks_with_deadline_page():
     st.title("Tasks with Deadline")
 
@@ -115,6 +128,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-

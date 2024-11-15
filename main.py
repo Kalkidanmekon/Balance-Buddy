@@ -2,107 +2,134 @@ import streamlit as st
 import pandas as pd
 from datetime import datetime, timedelta
 
-# Define the main structure of the app
-def main():
-    st.title("Balance Buddy")
-    st.sidebar.header("User Preferences")
+# --- App Title ---
+st.set_page_config(page_title="Equilibrium", layout="wide")
+st.title("Welcome to Equilibrium")
+st.subheader("Your AI-driven wellness scheduler for balance in work, health, and life.")
 
-    # Personalize the app introduction
-    st.write("Welcome to Balance Buddy, your AI-powered scheduling assistant!")
-    st.write("This app helps you balance your time between work, health, and personal life by creating a flexible yet structured schedule that adapts in real-time.")
+# --- Health Tip of the Day ---
+health_tips = [
+    "Remember to take breaks to stretch and hydrate.",
+    "Meditation can help you stay grounded during busy days.",
+    "A balanced diet improves productivity and mood.",
+    "Exercise regularly to reduce stress and boost energy."
+]
 
-    # User Input Section for Tasks
-    st.header("Step 1: Enter Your Commitments")
+# Random tip of the day (simulated)
+import random
+tip_of_the_day = random.choice(health_tips)
 
-    # Sample entries for commitments
-    # Non-flexible tasks like work and classes
-    non_flexible = st.sidebar.text_area("Non-flexible tasks (e.g., 'Work: 9 AM - 5 PM', 'Class: 11 AM - 12:30 PM')")
+st.markdown(f"**Tip of the Day**: {tip_of_the_day}")
+
+# Button to proceed to next step
+if st.button('Next: Start Organizing'):
+    st.write("Great! Let's get started with organizing your schedule.")
+
+    # --- User Task Input ---
+    st.header("Step 1: Enter Your Tasks")
+
+    # Create an empty DataFrame to store user inputs
+    task_data = []
+
+    days_of_week = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+
+    for day in days_of_week:
+        st.subheader(f"Enter tasks for {day}")
+
+        # Task Name
+        task_name = st.text_input(f"Task for {day}", key=f"task_{day}")
+        if task_name:
+            # Category: Work, Health, etc.
+            category = st.selectbox("Category", ["Work", "Health", "Social", "Personal Development", "Other"], key=f"category_{day}")
+
+            # Flexible/Non-Flexible
+            is_flexible = st.radio("Is this task flexible?", ['Yes', 'No'], key=f"flexible_{day}")
+            
+            # Flexible tasks: preferred time of day
+            if is_flexible == 'Yes':
+                preferred_time = st.selectbox(f"Preferred time for {task_name}", ["Morning", "Afternoon", "Evening"], key=f"preferred_time_{day}")
+            else:
+                preferred_time = "Fixed Time"
+            
+            # Deadline for homework-like tasks (only if flexible)
+            if 'homework' in task_name.lower():
+                deadline_date = st.date_input(f"Deadline for {task_name}", key=f"deadline_{day}")
+            else:
+                deadline_date = None
+            
+            # Collect task details
+            task_data.append({
+                "Task": task_name,
+                "Category": category,
+                "Day": day,
+                "Flexible": is_flexible,
+                "Preferred Time": preferred_time,
+                "Deadline": deadline_date
+            })
+
+        st.write("\n")
     
-    # Flexible tasks like gym or homework
-    flexible = st.sidebar.text_area("Flexible tasks (e.g., 'Gym: 1-hour, anytime between 5 PM - 8 PM')")
+    # Button to submit tasks and generate the schedule
+    if st.button('Generate Your Schedule'):
+        if task_data:
+            st.write("**Your Proposed Schedule**:")
 
-    # Categories of commitments
-    st.write("Categories can include:")
-    categories = st.multiselect("Select Categories", ["Work", "Health", "Social Life", "Education", "Other"])
-    
-    st.write("Here's an example of how you could enter your data:")
-    st.code("""
-    Non-flexible tasks:
-    - Work: 9 AM - 5 PM, weekdays
-    - Class: 11 AM - 12:30 PM, Tuesday and Thursday
-    
-    Flexible tasks:
-    - Gym: 1 hour, anytime between 5 PM - 8 PM
-    - Study: 2 hours, anytime in the evening
-    """)
+            # --- Generate Proposed Schedule ---
+            schedule_df = pd.DataFrame(task_data)
 
-    # Initial Scheduling Based on User Input
-    if st.button("Generate Initial Schedule"):
-        generate_initial_schedule(non_flexible, flexible, categories)
+            # Display the proposed schedule
+            st.dataframe(schedule_df)
 
-    # Example Calendar Preview
-    st.header("Calendar Preview")
-    st.write("Here is a sample weekly schedule:")
-    st.write("Monday - Friday: 9 AM - 5 PM: Work, 6 PM: Gym, 7 PM - 9 PM: Study")
+            st.write("This is your proposed schedule. Remember, flexible tasks can be moved around.")
 
-    # Placeholder for advanced scheduling with notifications and adjustments
-    st.write("Real-time scheduling adjustments will automatically manage tasks based on availability and priority.")
+            # --- Task Progress Tracking (Simulated) ---
+            st.header("Step 2: Track Your Progress")
+            st.write("At the end of each task, we'll track whether you were able to complete it.")
 
-    # Weekly Check-in and Analytics
-    st.header("Weekly Check-in")
-    st.write("At the end of each week, track your progress here.")
+            task_status = []
+            for _, row in schedule_df.iterrows():
+                task_completion = st.selectbox(f"Did you complete {row['Task']}?", ['Yes', 'No'], key=f"completion_{row['Task']}")
+                task_status.append(task_completion)
+            
+            # Show task completion status
+            st.write("**Your Progress:**")
+            task_status_df = schedule_df.copy()
+            task_status_df['Completion'] = task_status
 
-    st.write("Here's an example of feedback and adjustment recommendations based on task completion:")
-    st.code("""
-    Tasks completed on time: 80%
-    Adjustments suggested:
-    - Prioritize social activities earlier in the week
-    - Schedule 30-minute exercise blocks instead of 1 hour
-    """)
+            st.dataframe(task_status_df)
 
-    # Educational Section
-    st.header("Did You Know?")
-    st.write("Balance Buddy shares wellness tips based on your schedule.")
-    st.write("For example: 'Getting at least 7 hours of sleep improves focus and reduces stress.'")
+            st.write("Great job! Keep going!")
 
-    # Future Expansion Placeholder: Integrate with fitness and health data
-    st.header("Future Integrations")
-    st.write("This app will soon support connections to fitness apps for personalized health insights and activity recommendations.")
-    
-    # Gamification with Streaks
-    st.header("Gamification")
-    st.write("Earn points for completing tasks on time and unlock rewards like gym discounts and wellness kits.")
+            # --- Weekly Analytics (Simulated) ---
+            if st.button('Finish Week'):
+                st.write("**Weekly Analytics:**")
 
-    # Basic Settings
-    st.sidebar.header("Settings")
-    st.sidebar.write("Adjust app settings such as notification preferences, reminder frequency, and theme color.")
-    theme = st.sidebar.selectbox("Theme Color", ["Light Blue", "Light Green", "White"])
+                completed_tasks = task_status.count('Yes')
+                total_tasks = len(task_status)
+                completion_rate = (completed_tasks / total_tasks) * 100
 
-# Function to generate a mock initial schedule
-def generate_initial_schedule(non_flexible, flexible, categories):
-    st.write("Based on your entries, here’s a draft schedule:")
-    st.write("Non-flexible tasks:")
-    st.write(non_flexible if non_flexible else "No non-flexible tasks entered.")
+                st.write(f"You completed {completed_tasks} out of {total_tasks} tasks this week.")
+                st.write(f"Your task completion rate is {completion_rate}%.")
 
-    st.write("Flexible tasks:")
-    st.write(flexible if flexible else "No flexible tasks entered.")
+                # Feelings Survey
+                st.write("How do you feel about this week's progress?")
+                feelings = st.radio("Select how you feel:", ["Great", "Okay", "Could Improve"], key="feelings")
 
-    st.write("Task categories:")
-    st.write(", ".join(categories) if categories else "No categories selected.")
+                # Future Recommendations
+                if feelings == "Could Improve":
+                    st.write("We recommend incorporating more health activities into your schedule next week!")
+                elif feelings == "Okay":
+                    st.write("Nice job! Let's aim for a better balance next week!")
+                else:
+                    st.write("Fantastic work! Keep it up!")
 
-    # Sample Schedule Preview
-    st.subheader("Sample Schedule")
-    sample_schedule = {
-        "Monday": ["Work: 9 AM - 5 PM", "Gym: 6 PM", "Study: 7 PM - 9 PM"],
-        "Tuesday": ["Work: 9 AM - 5 PM", "Class: 11 AM - 12:30 PM", "Gym: 6 PM"],
-        "Wednesday": ["Work: 9 AM - 5 PM", "Gym: 6 PM", "Study: 7 PM - 9 PM"],
-        "Thursday": ["Work: 9 AM - 5 PM", "Class: 11 AM - 12:30 PM", "Social activity: 6 PM"],
-        "Friday": ["Work: 9 AM - 5 PM", "Gym: 6 PM"],
-    }
+                st.write("We'll adjust your schedule based on your feedback for next week.")
 
-    st.write(sample_schedule)
+            st.write("\n")
+        
+        else:
+            st.error("Please enter at least one task to generate a schedule.")
 
-    st.success("Initial schedule generated! Check the calendar preview and adjust tasks as needed.")
 
 # Run the app
 if __name__ == "__main__":

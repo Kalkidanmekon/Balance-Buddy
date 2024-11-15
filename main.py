@@ -2,24 +2,68 @@ import streamlit as st
 import pandas as pd
 import datetime
 
-# Function for Smart Calendar
+
+
+# Function for Smart Calendar with enhanced features
 def smart_calendar_page():
     st.title("📅 Smart Calendar")
     st.write("Organize your tasks effectively and achieve balance in your schedule.")
 
+    # Task Name
     task_name = st.text_input("Enter Task Name")
     if task_name:
-        task_date = st.date_input("Select Task Date", datetime.date.today())
-        start_time = st.time_input("Start Time")
-        end_time = st.time_input("End Time")
-        
-        if start_time >= end_time:
-            st.error("End time must be later than start time.")
+        # Task Category
+        category = st.selectbox("Select Task Category", ["Work", "Self-Care", "Class", "Social Life"])
+
+        # Flexibility of Task
+        flexibility = st.radio("Is this task flexible?", ["Yes", "No"])
+
+        if flexibility == "Yes":
+            time_of_day = st.selectbox("When are you comfortable doing this?", ["Morning", "Noon", "Evening"])
+            hours = st.number_input("How many hours do you want to allocate?", min_value=1, max_value=12, step=1)
+            st.success(f"Task '{task_name}' ({category}) is planned for the {time_of_day} for {hours} hours.")
         else:
-            st.success(f"Task '{task_name}' scheduled on {task_date} from {start_time} to {end_time}.")
-            
-        # Placeholder for future integration with dynamic calendar
-        st.info("Future updates will include a dynamic drag-and-drop calendar view.")
+            # Non-flexible task
+            task_date = st.date_input("Select Task Date", datetime.date.today())
+            start_time = st.time_input("Start Time")
+            end_time = st.time_input("End Time")
+            if start_time >= end_time:
+                st.error("End time must be later than start time.")
+            else:
+                st.success(f"Task '{task_name}' ({category}) scheduled on {task_date} from {start_time} to {end_time}.")
+
+        # Deadline
+        has_deadline = st.checkbox("Does this task have a deadline?")
+        if has_deadline:
+            deadline_date = st.date_input("Select Deadline Date", datetime.date.today())
+            st.warning(f"Make sure to complete '{task_name}' by {deadline_date}!")
+
+        # Summary of Task
+        st.subheader("Task Summary")
+        st.write(f"**Task Name**: {task_name}")
+        st.write(f"**Category**: {category}")
+        st.write(f"**Flexible**: {'Yes' if flexibility == 'Yes' else 'No'}")
+        if flexibility == "Yes":
+            st.write(f"**Preferred Time of Day**: {time_of_day}")
+            st.write(f"**Hours Allocated**: {hours}")
+        else:
+            st.write(f"**Task Date**: {task_date}")
+            st.write(f"**Start Time**: {start_time}")
+            st.write(f"**End Time**: {end_time}")
+        if has_deadline:
+            st.write(f"**Deadline**: {deadline_date}")
+
+# Main Function
+def main():
+    st.sidebar.title("Dashboard Navigation")
+    option = st.sidebar.radio("Go to", ["Smart Calendar", "Progress", "Resources", "Health Tips"])
+    
+    if option == "Smart Calendar":
+        smart_calendar_page()
+
+# Entry point
+if __name__ == "__main__":
+    main()
 
 # Function for Progress Analytics
 def progress_page():

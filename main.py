@@ -6,7 +6,7 @@ def welcome_page():
     st.title("Welcome to Balance Buddy!")
     st.write("""
     Welcome to **Balance Buddy**, your ultimate companion to help you balance work, health, and life. 
-    We help you organize your tasks, set your priorities, and achieve a healthy routine. 
+    We help you organize your tasks, set your priorities, and achieve a healthy routine 
     Let's get started and make your life more balanced!
     """)
     
